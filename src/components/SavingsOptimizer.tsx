@@ -34,9 +34,7 @@ export function SavingsOptimizer({ plan, totalAICCredits, userCount, promotional
           </p>
           {upgrade > 0 ? (
             <p className="text-xs text-muted-foreground">
-              {promotional
-                ? `Standard: $${upgradeStd.toFixed(2)} | Promo: $${upgradePromo.toFixed(2)}`
-                : `Standard: $${upgradeStd.toFixed(2)}`}
+              Standard: ${upgradeStd.toFixed(2)} | Promo: ${upgradePromo.toFixed(2)}
             </p>
           ) : (
             <p className="text-xs text-muted-foreground">
@@ -74,9 +72,7 @@ export function SavingsOptimizer({ plan, totalAICCredits, userCount, promotional
         </p>
         {downgrade > 0 ? (
           <p className="text-xs text-muted-foreground">
-            {promotional
-              ? `Standard: $${downgradeStd.toFixed(2)} | Promo: $${downgradePromo.toFixed(2)}`
-              : `Standard: $${downgradeStd.toFixed(2)}`}
+            Standard: ${downgradeStd.toFixed(2)} | Promo: ${downgradePromo.toFixed(2)}
           </p>
         ) : (
           <p className="text-xs text-muted-foreground">
