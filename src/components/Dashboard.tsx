@@ -22,6 +22,7 @@ import { WeekdayCadence } from "./WeekdayCadence";
 import { AICImpactTable } from "./AICImpactTable";
 import { PlanSettings } from "./PlanSettings";
 import { OldVsNewBilling } from "./OldVsNewBilling";
+import { SavingsOptimizer } from "./SavingsOptimizer";
 
 interface DashboardProps {
   records: UsageRecord[];
@@ -59,6 +60,13 @@ export function Dashboard({ records }: DashboardProps) {
           userCount={users.length}
         />
       </div>
+
+      <SavingsOptimizer
+        plan={plan}
+        promotional={promotional}
+        totalAICCredits={models.reduce((s, m) => s + m.aicAmount, 0) / 0.01}
+        userCount={users.length}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <DemandPulse data={daily} />
