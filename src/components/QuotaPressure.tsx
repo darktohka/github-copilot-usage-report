@@ -1,7 +1,9 @@
+import { useState } from "react"
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
 } from "recharts"
 import { Card, CardHeader, CardTitle, CardContent } from "./ui/card"
+import { Button } from "./ui/button"
 import type { QuotaSummary } from "../types"
 
 interface Props {
@@ -9,14 +11,22 @@ interface Props {
 }
 
 export function QuotaPressure({ data }: Props) {
-  const top = data.slice(0, 15)
+  const [showAll, setShowAll] = useState(false)
+  const top = showAll ? data : data.slice(0, 15)
   const maxUtil = Math.max(...top.map((u) => u.utilization), 100)
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm">Quota Pressure</CardTitle>
-        <div className="text-xs text-muted-foreground">Top users by monthly quota utilization</div>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-sm">Quota Pressure</CardTitle>
+            <div className="text-xs text-muted-foreground">Top users by monthly quota utilization</div>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => setShowAll(!showAll)}>
+            {showAll ? "Show top 15" : "Show all"}
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={Math.max(200, top.length * 36)}>

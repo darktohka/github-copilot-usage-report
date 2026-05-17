@@ -1,15 +1,18 @@
+import { useState } from "react"
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts"
 import { Card, CardHeader, CardTitle, CardContent } from "./ui/card"
+import { Button } from "./ui/button"
 import type { UserSummary } from "../types"
 
 interface Props {
   data: UserSummary[]
-  limit?: number
 }
 
-export function ChartRequestsPerUser({ data, limit = 15 }: Props) {
+export function ChartRequestsPerUser({ data }: Props) {
+  const [showAll, setShowAll] = useState(false)
+  const limit = showAll ? data.length : 15
   const chartData = data.slice(0, limit).map((u) => ({
     username: u.username,
     requests: u.totalRequests,
@@ -17,8 +20,11 @@ export function ChartRequestsPerUser({ data, limit = 15 }: Props) {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-sm">Top {limit} Users by Requests</CardTitle>
+        <Button variant="outline" size="sm" onClick={() => setShowAll(!showAll)}>
+          {showAll ? "Show top 15" : "Show all"}
+        </Button>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={Math.max(200, chartData.length * 36)}>

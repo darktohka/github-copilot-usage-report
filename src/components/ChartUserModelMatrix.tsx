@@ -1,4 +1,6 @@
+import { useState } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "./ui/card"
+import { Button } from "./ui/button"
 import type { UserSummary, ModelSummary } from "../types"
 
 interface Props {
@@ -7,16 +9,20 @@ interface Props {
 }
 
 export function ChartUserModelMatrix({ users, models }: Props) {
-  const topUsers = users.slice(0, 20)
-  const topModels = models.slice(0, 8).map((m) => m.model)
+  const [showAll, setShowAll] = useState(false)
+  const topUsers = showAll ? users : users.slice(0, 20)
+  const topModels = (showAll ? models : models.slice(0, 8)).map((m) => m.model)
   const maxVal = Math.max(
     ...topUsers.flatMap((u) => topModels.map((m) => u.modelCounts[m] || 0))
   )
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-sm">User × Model Usage Matrix (Top 20 users, Top 8 models)</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="text-sm">User × Model Usage Matrix {showAll ? `(${users.length} users, ${models.length} models)` : "(Top 20 users, Top 8 models)"}</CardTitle>
+        <Button variant="outline" size="sm" onClick={() => setShowAll(!showAll)}>
+          {showAll ? "Show top 20" : "Show all"}
+        </Button>
       </CardHeader>
         <CardContent className="overflow-x-auto max-h-[600px] overflow-y-auto">
         <table className="w-full text-xs">

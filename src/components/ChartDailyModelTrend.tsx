@@ -1,7 +1,9 @@
+import { useState } from "react"
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts"
 import { Card, CardHeader, CardTitle, CardContent } from "./ui/card"
+import { Button } from "./ui/button"
 import { MODEL_PALETTE } from "../lib/colors"
 import type { DailySummary, ModelSummary } from "../types"
 
@@ -11,7 +13,8 @@ interface Props {
 }
 
 export function ChartDailyModelTrend({ daily, models }: Props) {
-  const topModels = models.slice(0, 8).map((m) => m.model)
+  const [showAll, setShowAll] = useState(false)
+  const topModels = (showAll ? models : models.slice(0, 8)).map((m) => m.model)
   const chartData = daily.map((d) => {
     const row: Record<string, string | number> = { date: d.date.slice(5) }
     for (const m of topModels) {
@@ -22,8 +25,11 @@ export function ChartDailyModelTrend({ daily, models }: Props) {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-sm">Daily Request Breakdown by Model (Top 8)</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="text-sm">Daily Request Breakdown by Model {showAll ? `(${models.length})` : "(Top 8)"}</CardTitle>
+        <Button variant="outline" size="sm" onClick={() => setShowAll(!showAll)}>
+          {showAll ? "Show top 8" : "Show all"}
+        </Button>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={320}>

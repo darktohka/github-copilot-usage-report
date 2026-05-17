@@ -3,6 +3,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts"
 import { Card, CardHeader, CardTitle, CardContent } from "./ui/card"
+import { Button } from "./ui/button"
 import { Select } from "./ui/select"
 import { MODEL_PALETTE } from "../lib/colors"
 import type { DailySummary, ModelSummary } from "../types"
@@ -13,8 +14,9 @@ interface Props {
 }
 
 export function ModelTimeSeries({ daily, models }: Props) {
+  const [showAllModels, setShowAllModels] = useState(false)
   const [selected, setSelected] = useState("all")
-  const topModels = models.slice(0, 10).map((m) => m.model)
+  const topModels = (showAllModels ? models : models.slice(0, 10)).map((m) => m.model)
 
   const chartData = daily.map((d) => {
     const row: Record<string, string | number> = { date: d.date.slice(5) }
@@ -35,12 +37,17 @@ export function ModelTimeSeries({ daily, models }: Props) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-sm">Model Usage Over Time</CardTitle>
-        <Select value={selected} onChange={(e) => setSelected(e.target.value)}>
-          <option value="all">All models (top 10)</option>
-          {models.map((m) => (
-            <option key={m.model} value={m.model}>{m.model}</option>
-          ))}
-        </Select>
+        <div className="flex items-center gap-2">
+          <Select value={selected} onChange={(e) => setSelected(e.target.value)}>
+            <option value="all">All models {showAllModels ? `(${models.length})` : "(top 10)"}</option>
+            {models.map((m) => (
+              <option key={m.model} value={m.model}>{m.model}</option>
+            ))}
+          </Select>
+          <Button variant="outline" size="sm" onClick={() => setShowAllModels(!showAllModels)}>
+            {showAllModels ? "Top 10" : "All"}
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={320}>
