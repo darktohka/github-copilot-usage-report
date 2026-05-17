@@ -26,6 +26,7 @@ export interface DailySummary {
   uniqueUsers: number
   grossAmount: number
   netAmount: number
+  aicQuantity: number
   modelCounts: Record<string, number>
 }
 
@@ -35,6 +36,7 @@ export interface ModelSummary {
   grossAmount: number
   netAmount: number
   aicAmount: number
+  aicQuantity: number
   userCounts: Record<string, number>
 }
 

@@ -20,6 +20,7 @@ import { DemandPulse } from "./DemandPulse";
 import { QuotaPressure } from "./QuotaPressure";
 import { WeekdayCadence } from "./WeekdayCadence";
 import { AICImpactTable } from "./AICImpactTable";
+import { ChartAICCumulative } from "./ChartAICCumulative";
 import { PlanSettings } from "./PlanSettings";
 import { OldVsNewBilling } from "./OldVsNewBilling";
 import { SavingsOptimizer } from "./SavingsOptimizer";
@@ -40,7 +41,7 @@ export function Dashboard({ records }: DashboardProps) {
 
   return (
     <div className="space-y-6">
-      <StatsCards daily={daily} models={models} users={users} quota={quota} />
+      <StatsCards daily={daily} models={models} users={users} quota={quota} plan={plan} promotional={promotional} />
 
       <PlanSettings
         plan={plan}
@@ -96,6 +97,8 @@ export function Dashboard({ records }: DashboardProps) {
         <AICImpactTable models={models} />
         <ChartCostAnalysis models={models} daily={daily} />
       </div>
+
+      <ChartAICCumulative data={daily} />
     </div>
   );
 }

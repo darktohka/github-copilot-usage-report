@@ -82,6 +82,7 @@ export function buildDailySummaries(records: UsageRecord[]): DailySummary[] {
         uniqueUsers: users.size,
         grossAmount: recs.reduce((s, r) => s + r.gross_amount, 0),
         netAmount: recs.reduce((s, r) => s + r.net_amount, 0),
+        aicQuantity: recs.reduce((s, r) => s + r.aic_quantity, 0),
         modelCounts,
       }
     })
@@ -107,6 +108,7 @@ export function buildModelSummaries(records: UsageRecord[]): ModelSummary[] {
         grossAmount: recs.reduce((s, r) => s + r.gross_amount, 0),
         netAmount: recs.reduce((s, r) => s + r.net_amount, 0),
         aicAmount: recs.reduce((s, r) => s + r.aic_gross_amount, 0),
+        aicQuantity: recs.reduce((s, r) => s + r.aic_quantity, 0),
         userCounts,
       }
     })
