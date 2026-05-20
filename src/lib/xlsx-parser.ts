@@ -23,42 +23,76 @@ function parseCSVLine(line: string): string[] {
   return parts
 }
 
+function toRecord(row: Record<string, string>): UsageRecord | null {
+  const date = row.date || ""
+  const username = row.username || ""
+  if (!date || !username) return null
+  return {
+    date,
+    username,
+    product: row.product || "",
+    sku: row.sku || "",
+    model: normalizeModel(row.model || ""),
+    quantity: parseFloat(row.quantity) || 0,
+    unit_type: row.unit_type || "",
+    applied_cost_per_quantity: parseFloat(row.applied_cost_per_quantity) || 0,
+    gross_amount: parseFloat(row.gross_amount) || 0,
+    discount_amount: parseFloat(row.discount_amount) || 0,
+    net_amount: parseFloat(row.net_amount) || 0,
+    exceeds_quota: row.exceeds_quota || "",
+    total_monthly_quota: parseFloat(row.total_monthly_quota) || 0,
+    organization: row.organization || "",
+    cost_center_name: row.cost_center_name || "",
+    aic_quantity: parseFloat(row.aic_quantity) || 0,
+    aic_gross_amount: parseFloat(row.aic_gross_amount) || 0,
+  }
+}
+
+const EXPECTED_HEADERS = [
+  "date", "username", "product", "sku", "model",
+  "quantity", "unit_type", "applied_cost_per_quantity",
+  "gross_amount", "discount_amount", "net_amount",
+  "exceeds_quota", "total_monthly_quota", "organization",
+  "cost_center_name", "aic_quantity", "aic_gross_amount",
+]
+
+function parseMultiColumn(ws: XLSX.WorkSheet): UsageRecord[] {
+  const rows = XLSX.utils.sheet_to_json<Record<string, string>>(ws, {
+    raw: false,
+    defval: "",
+  })
+  return rows.map(toRecord).filter((r): r is UsageRecord => r !== null)
+}
+
+function parseSingleColumn(ws: XLSX.WorkSheet, range: XLSX.Range): UsageRecord[] {
+  const records: UsageRecord[] = []
+  for (let R = 1; R <= range.e.r; R++) {
+    const cell = ws[XLSX.utils.encode_cell({ r: R, c: 0 })]
+    if (!cell) continue
+    const parts = parseCSVLine(String(cell.v))
+    if (parts.length < 4) continue
+    const headers = EXPECTED_HEADERS
+    const row: Record<string, string> = {}
+    for (let i = 0; i < headers.length; i++) {
+      row[headers[i]] = parts[i] || ""
+    }
+    const r = toRecord(row)
+    if (r) records.push(r)
+  }
+  return records
+}
+
 export function parseXLSX(file: ArrayBuffer): UsageRecord[] {
   const wb = XLSX.read(file, { type: "array" })
   const ws = wb.Sheets[wb.SheetNames[0]]
   const ref = ws["!ref"]
   if (!ref) return []
   const range = XLSX.utils.decode_range(ref)
-  const records: UsageRecord[] = []
 
-  for (let R = 1; R <= range.e.r; R++) {
-    const cell = ws[XLSX.utils.encode_cell({ r: R, c: 0 })]
-    if (!cell) continue
-    const parts = parseCSVLine(String(cell.v))
-    if (parts.length < 4) continue
-    const r: UsageRecord = {
-      date: parts[0] || "",
-      username: parts[1] || "",
-      product: parts[2] || "",
-      sku: parts[3] || "",
-      model: normalizeModel(parts[4] || ""),
-      quantity: parseFloat(parts[5]) || 0,
-      unit_type: parts[6] || "",
-      applied_cost_per_quantity: parseFloat(parts[7]) || 0,
-      gross_amount: parseFloat(parts[8]) || 0,
-      discount_amount: parseFloat(parts[9]) || 0,
-      net_amount: parseFloat(parts[10]) || 0,
-      exceeds_quota: parts[11] || "",
-      total_monthly_quota: parseFloat(parts[12]) || 0,
-      organization: parts[13] || "",
-      cost_center_name: parts[14] || "",
-      aic_quantity: parseFloat(parts[15]) || 0,
-      aic_gross_amount: parseFloat(parts[16]) || 0,
-    }
-    records.push(r)
+  if (range.e.c > 0) {
+    return parseMultiColumn(ws)
   }
-
-  return records
+  return parseSingleColumn(ws, range)
 }
 
 export function buildDailySummaries(records: UsageRecord[]): DailySummary[] {
